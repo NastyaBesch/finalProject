@@ -1,42 +1,39 @@
 import axios from "axios";
 
-export const validateFormFields = (
+// Function to validate form fields for employee update
+export const validateFormUpdateFields = (
   user_name,
   last_name,
   password_hash,
   email,
   selectedRole
 ) => {
-  if (user_name.trim() === "" || !/^[א-ת]+$/i.test(user_name)) {
-    setUserName("");
-    setErrorMessage("אנא הכנס שם פרטי תקין");
-    console.log("validate user name section");
-    return { isValid: false, errorMessage: "אנא הכנס שם פרטי תקין" };
-  }
+  // Validate user_name: Should contain only Hebrew letters
+  const isValidUserName = /^[א-ת]+$/i.test(user_name.trim());
 
-  if (last_name.trim() === "" || !/^[א-ת]+$/i.test(last_name)) {
-    return { isValid: false, errorMessage: "בבקשה הכנס שם משפחה תקף" };
-  }
+  // Validate last_name: Should contain only Hebrew letters
+  const isValidLastName = /^[א-ת]+$/i.test(last_name.trim());
 
-  if (password_hash.trim() === "" || !/^\d{4}$/.test(password_hash)) {
-    return { isValid: false, errorMessage: "בבקשה הכנס סיסמה תקינה" };
-  }
+  // Validate password_hash: Should be a 4-digit number
+  const isValidPassword = /^\d{4}$/.test(password_hash.trim());
 
-  if (
-    email.trim() === "" ||
-    !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(email)
-  ) {
-    return { isValid: false, errorMessage: "בבקשה הכנס כתובת אימייל תקינה" };
-  }
+  // Validate email: Should be a valid email format
+  const isValidEmail = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(
+    email.trim()
+  );
 
-  if (selectedRole.trim() === "") {
-    return { isValid: false, errorMessage: "בבקשה תבחר שם תפקיד" };
-  }
+  // Validate selectedRole: Not used in the code
 
-  return { isValid: true, errorMessage: "" };
+  return (
+    isValidUserName && isValidLastName && isValidPassword && isValidEmail
+    // &&
+    // isValidSelectedRole
+  );
 };
 
+// Function to check if an email exists
 export const checkEmailExists = (email) => {
+  // Send a POST request to the server to check email existence
   return axios
     .post("http://localhost:4000/api/emailCount", { email })
     .then((response) => {
