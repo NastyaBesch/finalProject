@@ -1,0 +1,35 @@
+
+header {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding-inline: 50px;
+  color: rgba(0, 0, 0, 0.88);
+  background: #001529;
+}
+
+header ul {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 70px;
+  color: #fff;
+}
+
+li {
+  flex: 0 0 auto;
+  list-style-type: none;
+}
+
+a {
+  padding: 10px;
+  font-size: 18px;
+  color: #d6d1d1;
+  list-style-type: none;
+}
+a:hover{
+color: white;
+}
+a:active{
+ color: blue;
+}

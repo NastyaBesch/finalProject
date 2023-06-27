@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "@ant-design/icons": "^5.1.4",
+    "ant": "^0.2.0",
+    "antd": "^5.4.7",
+    "axios": "^1.4.0",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "mysql2": "^3.3.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-highlight-words": "^0.20.0",
+    "react-router-dom": "^6.11.1",
+    "uuid": "^9.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start & node server.js",
+    "build": "webpack --mode production"
+  },
+  "devDependencies": {
+    "react-scripts": "^5.0.1",
+    "webpack-cli": "^5.1.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
