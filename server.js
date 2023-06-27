@@ -253,6 +253,7 @@ app.get("/api/schedulesByProject/:projectId", (req, res) => {
 
 app.post("/api/allSchedules", (req, res) => {
   const { project_id } = req.body;
+  console.log("allSchedules");
 
   con.query(
     "SELECT * FROM schedules WHERE project_id = ?",
