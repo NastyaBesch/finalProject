@@ -6,11 +6,12 @@ export const validateFormUpdateFields = (
   last_name,
   password_hash,
   email,
-  selectedRole
+  selectedRole, 
+  errorMessage
 ) => {
   // Validate user_name: Should contain only Hebrew letters
   const isValidUserName = /^[א-ת]+$/i.test(user_name.trim());
-
+ 
   // Validate last_name: Should contain only Hebrew letters
   const isValidLastName = /^[א-ת]+$/i.test(last_name.trim());
 
@@ -44,3 +45,5 @@ export const checkEmailExists = (email) => {
       return false;
     });
 };
+
+
