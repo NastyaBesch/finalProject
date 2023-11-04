@@ -6,8 +6,6 @@ export const validateFormUpdateFields = (
   last_name,
   password_hash,
   email,
-  selectedRole, 
-  errorMessage
 ) => {
   // Validate user_name: Should contain only Hebrew letters
   const isValidUserName = /^[א-ת]+$/i.test(user_name.trim());

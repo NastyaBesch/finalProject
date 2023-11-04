@@ -34,7 +34,7 @@ const Schedules = () => {
       </Main>
 
       <Footer className="footer">
-        Ant Design ©2023 Created by Nastya && Zhenya
+     ©2023 Created by Nastya
       </Footer>
     </div>
   );

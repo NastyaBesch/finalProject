@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Header from "../../fragments/headers/Header";
 import { Footer } from "antd/es/layout/layout";
 import Main from "../../pages/Main";
 import Nav from "../Navigation";
-import "../../../general.css"
-import Qa from "../../fragments/qualityControl/QualityTable"
+import "../../../general.css";
+import Qa from "../../fragments/qualityControl/QualityTable";
+
 
 const QualityControl = () => {
   const nav = [
@@ -14,6 +15,7 @@ const QualityControl = () => {
   ];
 
   const components = [Qa];
+
   return (
     <div>
       <Header nav={nav} />
@@ -22,19 +24,18 @@ const QualityControl = () => {
           {/* <Nav /> */}
           <div className="mainSection">
             {components.map((Component, index) => (
-              <div style={{ padding: "20px" }}>
-                <Component key={index} />
+              <div style={{ padding: "20px" }} key={index}>
+                <Component />
               </div>
             ))}
           </div>
         </section>
       </Main>
       <Footer className="footer">
-        Ant Design ©2023 Created by Nastya && Zhenya
+       ©2023 Created by Nastya
       </Footer>
     </div>
   );
 };
-
 
 export default QualityControl;

@@ -7,7 +7,6 @@ import Schedules from "./components/fragments/schedules/Schedules";
 import Engineer from "./components/pages/engineer/Engineer";
 import TaskMaster from "./components/pages/TaskMaster";
 import QualityControl from "./components/fragments/qualityControl/QualityControl";
-import TableTasks from "./components/fragments/TableTasks";
 import ProjectTable from "./components/fragments/projects/ProjectTable";
 import ProjectDetails from "./components/fragments/projects/ProjectDetails";
 
@@ -19,7 +18,6 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<TableTasks />} />
           <Route path="/master" element={<TaskMaster />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/employees" element={<Employees />} />

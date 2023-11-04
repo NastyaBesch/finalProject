@@ -8,17 +8,19 @@ const MyModal = ({ children, content, btnStyle }) => {
     <>
       <Button
         onClick={() => setOpen(true)}
-        style={{ width: "max-content"}}
+        style={{ width: "max-content" }}
         type={btnStyle}
       >
         {content}
       </Button>
       <Modal
-        style={{ width: 1000 }}
+        style={{ maxWidth: "content", width: "800px", textAlign: "start" }}
         centered
-        visible={open}
+        // visible={open}
+        open={open}
         onOk={() => setOpen(false)}
         onCancel={() => setOpen(false)}
+        footer={null}
       >
         {children}
       </Modal>

@@ -1,20 +1,24 @@
-import { Table, Button, List } from "antd";
-import React, { useEffect, useState } from "react";
-import moment from "moment";
-import ProjectDetails from "./ProjectDetails";
+import React, { useEffect, useState, Space } from "react";
+import { Table, Button, Tooltip } from "antd";
 import MyModal from "../schedules/Modal";
 import ModalProjectUpdate from "../modals/ModalProjectUpdate";
 import FormTaskAdd from "./forms/FormTasksAdd";
 import CheckBoxTaskList from "../CheckBoxTasks";
 import { Link } from "react-router-dom";
+import BtnDelete from "../buttons/BtnDelete";
+import FilterOptionsComponent from "../filter/FilterOptionsComponent";
+import FilterSearch from "../filter/FilterSearch";
 
 const ProjectTable = () => {
   const [data, setData] = useState([]);
-  const [isDataUpdated, setDataUpdated] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  const [isDataUpdated, setDataUpdated] = useState(true);
+  const options = ["הושלם", "נוצר", "בתהליך", "באיחור"];
 
   useEffect(() => {
     fetchData();
-  }, []);
+    setFilteredData(data); // Initialize filteredData with the data array
+  }, [isDataUpdated]);
 
   const fetchData = async () => {
     try {
@@ -23,22 +27,14 @@ const ProjectTable = () => {
       });
       const response = await res.json();
       setData(response);
+      setDataUpdated(false); // Reset the isDataUpdated state variable
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const rowClassName = (record) => {
-    if (record.task_status === "באיחור") {
-      return "red-row"; // CSS class for rows with status "באחור"
-    }
-    if (record.task_statusstatus === "באימות") {
-      return "yellow-row"; // CSS class for rows with status "באימות"
-    }
-    if (record.task_status === "הושלם") {
-      return "green-row"; // CSS class for rows with status "הושלם"
-    }
-    return ""; // Empty string for other rows
+  const handleFilterChange = (filteredArray) => {
+    setFilteredData(filteredArray); // Update the filtered data state
   };
 
   const handleReload = () => {
@@ -48,10 +44,57 @@ const ProjectTable = () => {
   const columns = [
     {
       title: "",
+      dataIndex: "alert",
+      key: "alert",
+      render: (alert, record) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {alert[2] && (
+            <Tooltip title="באיחור">
+              <div className="circle" style={{ backgroundColor: "red" }} />
+            </Tooltip>
+          )}
+          {alert[3] && (
+            <Tooltip title="בבדיקה">
+              <div className="circle" style={{ backgroundColor: "orange" }} />
+            </Tooltip>
+          )}
+          {alert[4] && (
+            <Tooltip title="בתיקון">
+              <div className="circle" style={{ backgroundColor: "yellow" }} />
+            </Tooltip>
+          )}
+          {record.status === "הושלם" && (
+            <Tooltip title="הושלם">
+              <div
+                className="circle"
+                style={{ backgroundColor: "hsl(102, 53%, 61%)" }}
+              />
+            </Tooltip>
+          )}
+        </div>
+      ),
+    },
+
+    {
+      title: "",
+      dataIndex: "del",
+      key: "del",
+      render: (_, record) =>
+        record.status === "הושלם" ? (
+          <BtnDelete
+            delByElement={record.key} // Pass the unique key (project_id) to the BtnDeleteProject component
+            link="deleteProject"
+          />
+        ) : null,
+    },
+    {
+      title: "",
       dataIndex: "link",
       key: "link",
       render: (text, record) => (
-        <Link to={`/project-details/${record.key}`}><Button>לוח זמנים </Button></Link>
+        <Link to={`/project-details/${record.key}`}>
+          <Button>לוח זמנים </Button>
+        </Link>
       ),
     },
     {
@@ -60,7 +103,10 @@ const ProjectTable = () => {
       key: "add",
       render: (text, record) => (
         <MyModal content="הוספת משימות">
-          <CheckBoxTaskList  projectId={record.key}/>
+          <CheckBoxTaskList
+            projectId={record.key}
+            daysBetweenTasks={record.daysBetweenTasks}
+          />
           <FormTaskAdd />
         </MyModal>
       ),
@@ -71,39 +117,39 @@ const ProjectTable = () => {
       key: "link",
     },
     {
-      title: "תאריך התחלה",
-      dataIndex: "start_date",
-      key: "start_date",
-      render: (value) => {
-        const start_date = moment(value);
-        return start_date.isValid() ? start_date.format("DD/MM/YYYY") : "";
-      },
-    },
-    {
-      title: "תאריך סיום",
-      dataIndex: "finish_date",
-      key: "finish_date",
-      render: (value) => {
-        const apdate_finish_date = moment(value);
-        return apdate_finish_date.isValid()
-          ? apdate_finish_date.format("DD/MM/YYYY")
-          : "";
-      },
-    },
-    {
-      title: "סטטוס",
-      dataIndex: "task_status",
-      key: "task_status",
-      sorter: (a, b) => a.task_status.length - b.task_status.length,
-      sortDirections: ["descend", "ascend"],
-    },
-    {
       title: "עובד אחראי",
-      dataIndex: "user",
-      key: "user",
+      dataIndex: "user_name",
+      key: "user_name",
+      render: (text, record) => `${text} ${record.last_name}`,
     },
     {
-      title: "שם פרויקט",
+      title: (
+        <>
+          <span>סטטוס</span>
+          <FilterOptionsComponent
+            items={data}
+            options={options}
+            onFilterChange={handleFilterChange}
+            textFilter="בחר סטטוס"
+            filterbyItems="status"
+          />
+        </>
+      ),
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: (
+        <>
+          <span>שם פרויקט</span>
+          <FilterSearch
+            items={data}
+            onFilterChange={handleFilterChange}
+            textSearch="שם פרויקט"
+            search="name"
+          />
+        </>
+      ),
       dataIndex: "name",
       key: "name",
     },
@@ -112,27 +158,36 @@ const ProjectTable = () => {
   return (
     <Table
       columns={columns}
-      rowClassName={rowClassName}
-      dataSource={data.map((item) => ({
+      // rowClassName={rowClassName}
+      dataSource={filteredData.map((item) => ({
         key: item.project_id,
         name: item.name,
         team_id: item.team_id,
-        start_date: item.start_date,
-        finish_date: item.finish_date,
-        task_status: item.task_status,
-        user: item.user,
+        status: item.status,
+        user_name: item.user_name,
+        last_name: item.last_name,
+        daysBetweenTasks: item.daysBetweenTasks,
+        alert: item.alert,
         link: (
           <ModalProjectUpdate
             key={`modal-${item.project_id}`}
             project={{
               key: item.project_id,
               name: item.name,
-              team_id: item.team_id,
-              start_date: item.start_date,
-              finish_date: item.finish_date,
-              task_status: item.task_status,
+              user_id: item.user_id,
+              status: item.status,
             }}
           />
+        ),
+        add: (
+          <MyModal content="הוספת משימות">
+            <CheckBoxTaskList
+              projectId={item.project_id}
+              daysBetweenTasks={item.daysBetweenTasks}
+              startDate={item.formatted_start_date}
+            />
+            <FormTaskAdd />
+          </MyModal>
         ),
       }))}
     />

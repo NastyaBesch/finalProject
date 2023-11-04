@@ -1,75 +1,84 @@
 import React, { useEffect, useState } from "react";
-import moment from "moment";
-import { Button, Table } from "antd";
-import TaskDetails from "./TaskDetails";
-import MyModal from "../schedules/Modal";
-import { EditOutlined } from "@ant-design/icons";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Table } from "antd";
 import { useParams } from "react-router-dom";
+import BtnDeleteSchedule from "../buttons/BtnDeleteSchedule";
+import BtnAddQA from "../buttons/BtnSendToQA";
 import "../../../general.css";
+import ModalScheduleUpdate from "../modals/ModalScheduleUpdate";
+import MyModal from "../schedules/Modal";
+import { DeleteTwoTone } from "@ant-design/icons";
+import FilterOptionsComponent from "../filter/FilterOptionsComponent";
+import FilterSearch from "../filter/FilterSearch";
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
 
   const [schedules, setSchedules] = useState([]);
+  const [daysBetweenTasks, setDaysBetweenTasks] = useState(0);
+  const [filteredData, setFilteredData] = useState([]);
+  const [isDataUpdated, setDataUpdated] = useState(true);
+
+  const options = ["באיחור", "הושלם", "בתאליך"];
 
   useEffect(() => {
     fetchData();
-  }, [projectId]); // Fetch data whenever projectId changes
+    setFilteredData(schedules);
+  }, [projectId, isDataUpdated]); // Fetch data whenever projectId changes
 
   const fetchData = async () => {
     try {
-      const res = await fetch(
+      const schedulesResponse = await fetch(
         `http://localhost:4000/api/schedulesByProject/${projectId}`
       );
-      const response = await res.json();
-      setSchedules(response);
+      const schedulesData = await schedulesResponse.json();
+      setSchedules(schedulesData);
+      setDataUpdated(false);
+      // Fetch days between tasks data
+      const daysBetweenTasksResponse = await fetch(
+        `http://localhost:4000/api/daysBetweenTasksByProject/${projectId}`
+      );
+      const daysBetweenTasksData = await daysBetweenTasksResponse.json();
+      setDaysBetweenTasks(daysBetweenTasksData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
+  const handleFilterChange = (filteredArray) => {
+    setFilteredData(filteredArray); // Update the filtered data state
+  };
+
   const rowClassName = (record) => {
-    if (record.task_status === "באיחור") {
-      return "red-row"; // CSS class for rows with status "באחור"
+    const currentDate = new Date();
+    const finishDate = new Date(
+      record.finish_date.split("/").reverse().join("-")
+    );
+    if (finishDate < currentDate && record.task_status !== "הושלם") {
+      return "red-row"; // Apply the "red-row" CSS class to rows that meet the condition
     }
     if (record.task_status === "הושלם") {
-      return "greed-row"; // CSS class for rows with status "באחור"
+      return "green-row"; // CSS class for rows with task_status "הושלם"
     }
-    if (record.task_status === "ממתין לאישור") {
-      return "blue-row"; // CSS class for rows with status "באחור"
-    }
-
     return ""; // Empty string for other rows
   };
 
   const columns = [
     {
       title: "",
-      dataIndex: "del",
-      key: "del",
-      render: (text, record) => (
-        <MyModal content=<DeleteOutlined />>
-          <ProjectDetails projectId="projectId" />
-        </MyModal>
-      ),
+      dataIndex: "btnDel",
+      key: "buttonKey",
     },
     {
       title: "",
       dataIndex: "link",
       key: "link",
-      render: (text, record) => (
-        <MyModal content=<EditOutlined />>
-          <ProjectDetails projectId="projectId" />
-        </MyModal>
-      ),
     },
     {
       title: "",
-      dataIndex: "btn",
-      key: "buttonKey",
-      render: () => <Button>שליחה לבקרת איכות</Button>,
+      dataIndex: "btnAddQA",
+      key: "btnAddQA",
     },
+
     {
       title: "עובד אחראי",
       dataIndex: "user_name",
@@ -77,29 +86,30 @@ const ProjectDetails = () => {
       render: (text, record) => `${text} ${record.last_name}`,
     },
     {
-      title: "סטטוס",
+      title: (
+        <>
+          <span>סטטוס</span>
+          <FilterOptionsComponent
+            items={schedules}
+            options={options}
+            onFilterChange={handleFilterChange}
+            textFilter="בחר סטטוס"
+            filterbyItems="task_status"
+          />
+        </>
+      ),
       dataIndex: "task_status",
       key: "task_status",
-      sorter: (a, b) => a.task_status.length - b.task_status.length,
-      sortDirections: ["descend", "ascend"],
     },
     {
       title: "תאריך סיום",
       dataIndex: "finish_date",
       key: "finish_date",
-      render: (value) => {
-        const date = moment(value);
-        return date.isValid() ? date.format("DD/MM/YYYY") : "";
-      },
     },
     {
       title: "תאריך התחלה",
       dataIndex: "start_date",
       key: "start_date",
-      render: (value) => {
-        const date = moment(value);
-        return date.isValid() ? date.format("DD/MM/YYYY") : "";
-      },
     },
     {
       title: "תיאור",
@@ -107,11 +117,19 @@ const ProjectDetails = () => {
       key: "description",
     },
     {
-      title: "שם משימה",
+      title: (
+        <>
+          <span>שם משימה</span>
+          <FilterSearch
+            items={schedules}
+            onFilterChange={handleFilterChange}
+            textSearch="שם משימה"
+            search="task_name"
+          />
+        </>
+      ),
       dataIndex: "task_name",
       key: "task_name",
-      sorter: (a, b) => a.task_name.length - b.task_name.length,
-      sortDirections: ["descend", "ascend"],
     },
   ];
 
@@ -119,21 +137,60 @@ const ProjectDetails = () => {
     <Table
       dir="rtl"
       columns={columns}
-      dataSource={schedules}
+      dataSource={filteredData.map((item) => ({
+        key: item.id,
+        task_name: item.task_name,
+        user_name: item.user_name,
+        last_name: item.last_name,
+        start_date: item.formatted_start_date,
+        finish_date: item.formatted_finish_date,
+        task_status: item.task_status,
+        description: item.description,
+        finishDateBeforeChange: item.formatted_finish_date,
+        btnDel: (
+          <MyModal content={<DeleteTwoTone />}>
+            <div
+              dir="rtl"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <p>
+                בעת מחיקת המשימה, לא תהיה אפשרות לשחזור אותה. תאריכי המשימות
+                יועברו קדימה לפי השינוי. אנא אשר את המחיקה.
+              </p>
+
+              <BtnDeleteSchedule
+                key={`modal-${item.id}`}
+                scheduleId={item.id}
+                schedules={schedules}
+                daysBetweenTasks={daysBetweenTasks}
+              />
+            </div>
+          </MyModal>
+        ),
+        btnAddQA: <BtnAddQA key={`modal-${item.id}`} scheduleId={item.id} />,
+        link: (
+          <ModalScheduleUpdate
+            schedules={schedules}
+            projectId={projectId}
+            finishDateBeforeChange={item.formatted_finish_date}
+            key={`modal-${item.id}`}
+            schedule={{
+              key: item.id,
+              scheduleId: item.id,
+              start_date: item.formatted_start_date,
+              finish_date: item.formatted_finish_date,
+              description: item.description,
+              task_status: item.task_status,
+              user_id: item.user_id,
+            }}
+          />
+        ),
+      }))}
       rowClassName={rowClassName}
-      //  link: (
-      // <Modal content="dffff"/>
-      // key={`modal-${item.project_id}`}
-      // project={{
-      //   key: item.project_id,
-      //   name: item.name,
-      //   team_id: item.team_id,
-      //   start_date: item.start_date,
-      //   finish_date: item.finish_date,
-      //   status: item.status,
-      // }}
-      // />
-      //     ),
     />
   );
 };

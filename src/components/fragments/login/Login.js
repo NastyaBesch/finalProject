@@ -16,10 +16,18 @@ const onFinish = async (values) => {
     const connectionString = "http://localhost:4000/api/login";
 
     /************************************************************************ */
-    //respons contains jason format message and user type.
-    //user type will determin what type of page will be loaded to the user on a successfull login
+    // Response contains JSON format message and user type.
+    // User type will determine what type of page will be loaded for the user on a successful login.
     const response = await Axios.post(connectionString, values);
     console.log("Backend response:", response.data);
+
+    if (response.data.user_role === "מנהל עבודה") {
+      window.location.href = "Engineer.js"; // Redirect to Engineer.js
+    } else if (response.data.user_role === "מהנדס ביצוע") {
+      window.location.href = "/admin"; // Redirect to admin page
+    } else if (response.data.user_role === "מנהל פרויקט") {
+      window.location.href = "/admin"; // Redirect to admin page
+    }
   } catch (error) {
     console.error("Error:", error);
   }
@@ -99,4 +107,5 @@ const Login = () => (
     </Form.Item>
   </Form>
 );
+
 export default Login;

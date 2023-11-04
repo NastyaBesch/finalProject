@@ -6,9 +6,7 @@ import React, { useState } from "react";
 import { Button, Alert, Switch, Input } from "antd";
 import axios from "axios";
 import { v4 } from "uuid";
-import CheckBoxTaskList from "../../CheckBoxTasks";
-import DropdownUsers from "../../dropDown/DropUsers";
-import FormTaskAdd from "./FormTasksAdd";
+import DropdownUsers from "../../dropDown/DropUsers"
 import { validateFormProjectFields } from "./validateFormProject";
 import "./employeeAdd.css";
 
@@ -17,20 +15,17 @@ const FormProjectAdd = () => {
   const [project_name, setProjectName] = useState("");
   const [status, setStatus] = useState("נוצר");
   const [errorMessage, setErrorMessage] = useState("");
-  const [finishDate, setFinishDate] = useState("");
-  const [startDate, setStartDate] = useState("");
+  // const [finishDate, setFinishDate] = useState("");
+  // const [startDate, setStartDate] = useState("");
   const [selectedUser, setSelectedUserID] = useState("");
   const [projectId, setProjectId] = useState("");
-  const [isProjectCreated, setIsProjectCreated] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [onChange, setOnChange] = useState(false);
   const [daysBetweenTasks, setDaysBetweenTasks] = useState(0);
   const [isProjectNameValid, setIsProjectNameValid] = useState(true);
-  const [isStartDateValid, setIsStartDateValid] = useState(true);
-  const [isFinishDateValid, setIsFinishDateValid] = useState(true);
+  // const [isStartDateValid, setIsStartDateValid] = useState(true);
+  // const [isFinishDateValid, setIsFinishDateValid] = useState(true);
   const [isUserSelected, setIsUserSelected] = useState(true);
 
-  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in "YYYY-MM-DD" format
+  // const currentDate = new Date().toISOString().split("T")[0]; // Get current date in "YYYY-MM-DD" format
 
   const handleUserChange = (event) => {
     // Update selected user ID
@@ -50,19 +45,22 @@ const FormProjectAdd = () => {
     const isValid = validateFormProjectFields(
       project_name,
       selectedUser,
-      startDate,
-      finishDate
+      // startDate,
+      // finishDate
     );
 
     setIsProjectNameValid(project_name !== "");
     setIsUserSelected(selectedUser.trim() !== "");
-    setIsStartDateValid(startDate !== "" && new Date(startDate) > new Date());
-    setIsFinishDateValid(
-      finishDate !== "" && new Date(finishDate) > new Date(startDate)
-    );
+    // setIsStartDateValid(startDate !== "" && new Date(startDate) > new Date());
+    // setIsFinishDateValid(
+    //   finishDate !== "" && new Date(finishDate) > new Date(startDate)
+    // );
 
     if (!isValid) {
       setErrorMessage("אנא מלא את כל השדות כראוי");
+       setTimeout(() => {
+         setErrorMessage("");
+       }, 2000);
       return;
     } else {
       // Create a new project object
@@ -70,8 +68,10 @@ const FormProjectAdd = () => {
         name: project_name,
         project_id: v4(),
         user_id: selectedUser,
-        start_date: startDate,
-        finish_date: finishDate,
+        status: "נוצר",
+        // start_date: startDate,
+        // finish_date: finishDate,
+        daysBetweenTasks: daysBetweenTasks,
       };
 
       // Make a POST request to add the project
@@ -80,22 +80,17 @@ const FormProjectAdd = () => {
         .then((response) => {
           // Reset form fields and set success message
           setProjectName("");
-          setFinishDate("");
-          setStartDate("");
+          // setFinishDate("");
+          setDaysBetweenTasks(0);
+          // setStartDate("");
           setSelectedUserID("");
-          setIsProjectCreated(true);
           setProjectId(project.project_id);
-          setSuccessMessage("הפרויקט נוצר. אנא תוסיף את המשימות");
+          window.location.reload(false); 
         })
         .catch((error) => {
           console.error("Error creating project:", error);
         });
     }
-  };
-
-  const handleSwitchChange = (checked) => {
-    // Update the switch state
-    setOnChange(checked);
   };
 
   return (
@@ -109,19 +104,8 @@ const FormProjectAdd = () => {
           onClose={() => setErrorMessage("")}
         />
       )}
-      {successMessage && (
-        <Alert
-          className="alert"
-          message={successMessage}
-          type="success"
-          closable
-          onClose={() => setSuccessMessage("")}
-        />
-      )}
-      {!isProjectCreated && (
         <form className="formAdd" onSubmit={handleSubmit} dir="rtl">
           <div className={isProjectNameValid ? "" : "invalid"}>
-            {/* Project Name */}
             <label htmlFor="project_name">שם פרויקט</label>
             <input
               type="text"
@@ -130,9 +114,9 @@ const FormProjectAdd = () => {
               onChange={(event) => setProjectName(event.target.value)}
             />
           </div>
-          <div className={isStartDateValid ? "" : "invalid"}>
+          {/* <div className={isStartDateValid ? "" : "invalid"}> */}
             {/* Start Date */}
-            <label htmlFor="startDate">תאריך התחלה</label>
+            {/* <label htmlFor="startDate">תאריך התחלה</label>
             <input
               type="date"
               id="startDate"
@@ -141,9 +125,9 @@ const FormProjectAdd = () => {
               min={currentDate} // Set the minimum allowed date to the current date
             />
           </div>
-          <div className={isFinishDateValid ? "" : "invalid"}>
+          <div className={isFinishDateValid ? "" : "invalid"}> */}
             {/* Finish Date */}
-            <label htmlFor="finishDate">תאריך סיום</label>
+            {/* <label htmlFor="finishDate">תאריך סיום</label>
             <input
               type="date"
               id="finishDate"
@@ -151,7 +135,7 @@ const FormProjectAdd = () => {
               onChange={(e) => setFinishDate(e.target.value)}
               min={startDate} // Set the minimum allowed date to the selected start date
             />
-          </div>
+          </div> */}
           <div>
             {/* Days Between Tasks */}
             <label htmlFor="daysBetweenTasks"> מספר ימים בין משימות </label>
@@ -180,27 +164,6 @@ const FormProjectAdd = () => {
             </Button>
           </div>
         </form>
-      )}
-      {isProjectCreated && (
-        <section dir="rtl">
-          {/* Checkbox Task List */}
-          <CheckBoxTaskList
-            onSubmit={handleSubmit}
-            projectId={projectId}
-            daysBetweenTasks={daysBetweenTasks}
-            startDate={startDate}
-          />
-          <p>ליצור משימה חדשה</p>
-          {/* Switch Button */}
-          <Switch defaultChecked onChange={handleSwitchChange} />
-          {onChange && (
-            <>
-              {/* Form for Adding New Task */}
-              <FormTaskAdd />
-            </>
-          )}
-        </section>
-      )}
     </>
   );
 };

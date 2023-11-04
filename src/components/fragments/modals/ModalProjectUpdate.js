@@ -1,21 +1,20 @@
 import React, { useState } from "react";
 import { Button, Modal, Form, Input, Alert, DatePicker } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { EditTwoTone} from "@ant-design/icons";
 import CheckBoxTaskList from "../CheckBoxTasks";
-import moment from "moment";
+import DropdownUsers from "../dropDown/DropUsers";
 
 const ModalProjectUpdate = ({ project }) => {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [selectedUser, setSelectedUserID] = useState("");
 
+   const handleUserChange = (event) => {
+     const selectedUserId = event.target.value;
+     setSelectedUserID(selectedUserId);
+   };
 
-   {
-     /* Input field for start date */
-   }
-   <Form.Item label="תאריך התחלה" name="start_date">
-     <DatePicker format="DD/MM/YYYY" />
-   </Form.Item>;
   // Function to handle the project update
   const handleUpdateProject = async (projectId, values) => {
     try {
@@ -29,10 +28,8 @@ const ModalProjectUpdate = ({ project }) => {
           },
           body: JSON.stringify({
             name: values.name,
-            description: values.description,
-            start_date: values.start_date,
-            finish_date: values.finish_date,
-            team_id: values.team_id,
+            user_id: values.user_id,
+            // status: values.status,
           }),
         }
       );
@@ -77,7 +74,7 @@ const ModalProjectUpdate = ({ project }) => {
 
       {/* Button to open the modal */}
       <Button onClick={() => setOpen(true)} style={{ width: "max-content" }}>
-        <EditOutlined />
+        <EditTwoTone />
       </Button>
 
       {/* Modal for project update */}
@@ -85,6 +82,7 @@ const ModalProjectUpdate = ({ project }) => {
         visible={open}
         onOk={() => setOpen(false)}
         onCancel={() => setOpen(false)}
+        footer={null}
       >
         <Form
           form={form}
@@ -100,15 +98,20 @@ const ModalProjectUpdate = ({ project }) => {
           </Form.Item>
 
           {/* Input field for start date */}
-          <Form.Item label="תאריך התחלה" name="start_date">
+          {/* <Form.Item label="תאריך התחלה" name="start_date">
             <Input />
           </Form.Item>
 
           {/* Input field for finish date */}
-          <Form.Item label="תאריך סיום" name="finish_date" type="data">
+          {/* <Form.Item label="תאריך סיום" name="finish_date" type="data">
             <Input />
+          </Form.Item> */} 
+          {/* <Form.Item label="סטטוס" name="status" type="data">
+            <Input />
+          </Form.Item> */}
+          <Form.Item label="עובד החראי" name="user_id" type="data">
+            <DropdownUsers value={selectedUser} onChange={handleUserChange} />
           </Form.Item>
-
           {/* Checkbox task list component */}
           {/* <CheckBoxTaskList projectId={project.key} /> */}
 

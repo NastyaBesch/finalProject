@@ -13,7 +13,6 @@ const FormEmployeeAdd = () => {
   const [emailExists, setEmailExists] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const roles = ["מנהל פרויקט", "מהנדס ביצוע", "מנהל עבודה"];
 
   // Function to perform form validation
@@ -22,6 +21,9 @@ const FormEmployeeAdd = () => {
     if (user_name.trim() === "" || !/^[א-ת]+$/i.test(user_name)) {
       setUserName("");
       setErrorMessage("אנא הכנס שם פרטי תקין");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 2000);
       console.log("validate user name section")
       return false;
     }
@@ -29,6 +31,9 @@ const FormEmployeeAdd = () => {
     if (last_name.trim() === "" || !/^[א-ת]+$/i.test(last_name)) {
       setLastName("");
       setErrorMessage("בבקשה הכנס שם משפחה תקף");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 2000);
       console.log("validate user last name section");
       return false;
     }
@@ -36,6 +41,9 @@ const FormEmployeeAdd = () => {
     if (password_hash.trim() === "" || !/^\d{4}$/.test(password_hash)) {
       setPassword("");
       setErrorMessage("בבקשה הכנס סיסמה תקינה");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 2000);
       console.log("validate password section");
       return false;
     }
@@ -45,13 +53,19 @@ const FormEmployeeAdd = () => {
       !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(email)
     ) {
       setEmail("");
-      setErrorMessage("בבקשה הכנס כתובת אימייל תקינה");
+      setErrorMessage("בקשה הכנס כתובת אמייל תקינה");
+      setTimeout(() => {
+        setErrorMessage("")
+      }, 2000);
       console.log("validate email text section");
       return false;
     }
 
     if (selectedRole.trim() === "") {
       setErrorMessage("בבקשה תבחר שם תפקיד");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 2000);
       console.log("validate rolw selected section");
       return false;
     }
@@ -75,7 +89,7 @@ const FormEmployeeAdd = () => {
   useEffect(() => {
     checkEmailExists();
   }, [email]);
-  console.log("return true if email exits else fallse", emailExists);
+  console.log("return true if email exits else false", emailExists);
 
 
 
@@ -94,7 +108,11 @@ const FormEmployeeAdd = () => {
     }
     if (emailExists) {
       setEmail("");
+      setEmailExists(false)
       setErrorMessage("דואר אלקטרוני כבר קיים במערכת");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 2000);
       return;
     }
 
@@ -117,11 +135,17 @@ const FormEmployeeAdd = () => {
         setPassword("");
         setEmail("");
         setSelectedRole("");
-        setSuccessMessage("המשתמש נוסף");
+
+        if (response.data === true) {
+          window.location.reload(false);
+        }
       })
       .catch((error) => {
         console.error("Error adding Employee:", error);
         setErrorMessage("שגיאה בהוספת המשתמש, אנא נסה שוב");
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 2000);
       });
   };
 
@@ -134,15 +158,6 @@ const FormEmployeeAdd = () => {
           type="error"
           closable
           onClose={() => setErrorMessage("")}
-        />
-      )}
-      {successMessage && ( 
-        <Alert
-          className="alert"
-          message={successMessage}
-          type="success"
-          closable
-          onClose={() => setSuccessMessage("")}
         />
       )}
       <div>

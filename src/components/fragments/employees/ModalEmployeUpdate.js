@@ -5,15 +5,15 @@
 //the modal is opened for editing the employee details.
 /******************************************************** */
 
-
 import React, { useState } from "react";
 import { Button, Form, Input, Alert, Modal } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { EditTwoTone } from "@ant-design/icons";
 import DropdownComponent from "../dropDown/DropNew";
 import {
   validateFormUpdateFields,
   checkEmailExists,
 } from "../projects/forms/validateForm.js";
+import "../projects/forms/employeeAdd.css";
 
 const ModalEmployeesUpdate = ({ employee }) => {
   // State variables
@@ -22,6 +22,11 @@ const ModalEmployeesUpdate = ({ employee }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [emailExists, setEmailExists] = useState(false);
+  const [isValidUserName, setIsValidUserName] = useState(true);
+  const [isValidLastName, setIsValidLastName] = useState(true);
+  const [isValidPassword, setIsValidPassword] = useState(true);
+  const [isValidEmail, setIsValidEmail] = useState(true);
+
   const roles = ["מנהל פרויקט", "מהנדס ביצוע", "מנהל עבודה"];
 
   const [form] = Form.useForm();
@@ -74,18 +79,28 @@ const ModalEmployeesUpdate = ({ employee }) => {
         values.email,
         selectedRole
       );
+
+      // setIsProjectNameValid(
+      //   (values.user_name = /^[א-ת]+$/i.test(user_name.trim()))
+      // );
+      // setIsValidLastName(
+      //   (values.last_name = /^[א-ת]+$/i.test(user_name.trim()))
+      // );
+      // setIsUserSelected(selectedUser.trim() !== "");
+
       console.log(isValid);
-      if (isValid) {
+      if (!isValid) {
+        // Set error message if the form fields are not valid
+        setErrorMessage("אנא מלא את כל השדות כראוי");
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 2000);
+        return;
+      } else {
         // Update the employee data
         handleUpdateEmployee(employee.key, values);
         window.location.reload(false);
         setSuccessMessage("gggg");
-      }
-      if (!isValid) {
-        // Set error message if the form fields are not valid
-        setErrorMessage(
-          "לא ניתן לשנות את נתוני העובד. אנא לבדוק שהשם הפרטי והמשפחה מכילים רק אותיות והסיסמה מורכבת מ-4 ספרות"
-        );
       }
     } catch (error) {
       console.error("Error validating form fields:", error);
@@ -108,14 +123,10 @@ const ModalEmployeesUpdate = ({ employee }) => {
       )}
       {/* Button to open the modal */}
       <Button onClick={() => setOpen(true)} style={{ width: "max-content" }}>
-        <EditOutlined />
+        <EditTwoTone />
       </Button>
       {!isUserUpdated && (
-        <Modal
-          visible={open}
-          onOk={() => setOpen(false)}
-          onCancel={() => setOpen(false)}
-        >
+        <Modal open={open} onCancel={() => setOpen(false)} footer={null}>
           {/* Form to update the employee data */}
           <Form
             form={form}
@@ -135,7 +146,11 @@ const ModalEmployeesUpdate = ({ employee }) => {
                 onClose={() => setSuccessMessage("")}
               />
             )}
-            <Form.Item label="שם פרטי" name="user_name">
+            <Form.Item
+              label="שם פרטי"
+              name="user_name"
+              className={isValidUserName ? "" : "invalid"}
+            >
               <Input id="user_name" />
             </Form.Item>
             <Form.Item label="שם משפחה" name="last_name">
@@ -150,7 +165,7 @@ const ModalEmployeesUpdate = ({ employee }) => {
             <Form.Item label="תפקיד" name="role">
               {/* DropdownComponent is not used here */}
               <select value={selectedRole} onChange={handleRoleChange}>
-                <option value=""></option>
+                {/* <option value=""></option> */}
                 {roles.map((role) => (
                   <option key={role} value={role}>
                     {role}

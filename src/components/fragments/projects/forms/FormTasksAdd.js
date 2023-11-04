@@ -2,7 +2,7 @@
 //The component FormTaskAdd provides a form for adding tasks. When the form is submitted, it sends a POST request to a specified API endpoint to create a new task.
 /************************************************** */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Alert, Button } from "antd";
 import { v4 } from "uuid";
@@ -12,30 +12,29 @@ const FormTaskAdd = () => {
   const [taskName, setTaskName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [taskExists, setTaskExists] = useState(false);
 
   const validateForm = () => {
     if (taskName.trim() === "") {
       setErrorMessage("אנא הכנס משימה");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 1200);
       return false;
     }
     return true;
   };
 
-  const checkTaskExists = () => {
-    return axios
-      .post("http://localhost:4000/api/taskCount", { taskName })
-      .then((response) => {
-        setTaskExists(response.data);
-      })
-      .catch((error) => {
-        console.error("Error checking task:", error);
+  const checkTaskExists = async () => {
+    try {
+      const response = await axios.post("http://localhost:4000/api/taskCount", {
+        taskName,
       });
+      return response.data > 0;
+    } catch (error) {
+      console.error("Error checking task:", error);
+    }
   };
 
-  useEffect(() => {
-    checkTaskExists();
-  }, [taskName]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,9 +43,13 @@ const FormTaskAdd = () => {
       return;
     }
 
+    let taskExists = await checkTaskExists();
     if (taskExists) {
       setTaskName("");
       setErrorMessage("משימה כבר קיימת במערכת");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 1200);
       return;
     }
 
@@ -63,7 +66,10 @@ const FormTaskAdd = () => {
       setTaskName("");
       setErrorMessage("");
       setSuccessMessage("המשימה נוצרה");
-      setTaskExists(false)
+      setTimeout(() => {
+        setSuccessMessage("");
+       // setTaskExists(false); // Reset taskExists after successful addition
+      }, 1200);
     } catch (error) {
       console.error("Error creating task:", error);
     }
@@ -117,3 +123,4 @@ const FormTaskAdd = () => {
 };
 
 export default FormTaskAdd;
+
