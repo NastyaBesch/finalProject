@@ -1,5 +1,6 @@
-node_modules/*
-node_modules/
 public/images/*
 all.txt
-node_modules/.cache/default-development/*
+node_modules/.cache/
+node_modules/
+
+
