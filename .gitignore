@@ -1,4 +1,4 @@
-node_modules/
+node_modules/*
 public/images/*
 all.txt
-node_modules/.cache/default-development/22.pack
+node_modules/.cache/default-development/*
