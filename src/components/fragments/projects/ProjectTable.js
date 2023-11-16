@@ -9,11 +9,12 @@ import BtnDelete from "../buttons/BtnDelete";
 import FilterOptionsComponent from "../filter/FilterOptionsComponent";
 import FilterSearch from "../filter/FilterSearch";
 
-const ProjectTable = () => {
+const ProjectTable = (userRole) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isDataUpdated, setDataUpdated] = useState(true);
   const options = ["הושלם", "נוצר", "בתהליך", "באיחור"];
+  
 
   useEffect(() => {
     fetchData();
@@ -74,19 +75,17 @@ const ProjectTable = () => {
         </div>
       ),
     },
-
-    {
-      title: "",
-      dataIndex: "del",
-      key: "del",
-      render: (_, record) =>
-        record.status === "הושלם" ? (
-          <BtnDelete
-            delByElement={record.key} // Pass the unique key (project_id) to the BtnDeleteProject component
-            link="deleteProject"
-          />
-        ) : null,
-    },
+    userRole === "מנהל פרויקט"
+      ? {
+          title: "",
+          dataIndex: "del",
+          key: "del",
+          render: (_, record) =>
+            record.status === "הושלם" ? (
+              <BtnDelete delByElement={record.key} link="deleteProject" />
+            ) : null,
+        }
+      : null,
     {
       title: "",
       dataIndex: "link",
@@ -157,8 +156,7 @@ const ProjectTable = () => {
 
   return (
     <Table
-      columns={columns}
-      // rowClassName={rowClassName}
+      columns={columns.filter((column) => column !== null)}
       dataSource={filteredData.map((item) => ({
         key: item.project_id,
         name: item.name,
