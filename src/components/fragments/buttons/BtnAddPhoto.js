@@ -1,9 +1,11 @@
 import React, { useState, useRef } from "react";
 import { FileImageTwoTone } from "@ant-design/icons";
 import { Button } from "antd";
+import "../../../general.css";
 
 const BtnAddPhoto = ({ onPhotoAdded, qaId }) => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [uploadPhoto, setUploadPhoto] = useState(true);
   const fileInputRef = useRef(null);
 
   const handlePhotoChange = (event) => {
@@ -42,6 +44,9 @@ const BtnAddPhoto = ({ onPhotoAdded, qaId }) => {
       );
 
       if (response.ok) {
+        console.log(uploadPhoto);
+        setUploadPhoto(false);
+        console.log(uploadPhoto);
         // Reload the page after successful upload
         window.location.reload(false);
       } else {
@@ -62,19 +67,20 @@ const BtnAddPhoto = ({ onPhotoAdded, qaId }) => {
         onChange={handleFileInputChange}
       />
       <div>
-        {selectedPhoto ? (
-          <img
-            src={URL.createObjectURL(selectedPhoto)}
-            alt="Selected"
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
-        ) : null
-        // <FileImageTwoTone style={{ fontSize: "24px" }} />
+        {
+          selectedPhoto ? (
+            <img
+              src={URL.createObjectURL(selectedPhoto)}
+              alt="Selected"
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+          ) : null
+          // <FileImageTwoTone style={{ fontSize: "24px" }} />
         }
       </div>
-      <Button onClick={handleUploadClick}>
-        <FileImageTwoTone />
-      </Button>
+        <Button onClick={handleUploadClick}>
+          <FileImageTwoTone />
+        </Button>
     </div>
   );
 };

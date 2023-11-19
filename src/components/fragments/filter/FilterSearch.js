@@ -3,7 +3,7 @@ import { Input, Popover, Button, Space } from "antd";
 import { FilterTwoTone } from "@ant-design/icons";
 
 const FilterSearch = ({ items, onFilterChange, textSearch, search }) => {
-  const [searchFilter, setSearchFilter] = useState(search);
+  const [searchFilter, setSearchFilter] = useState("");
 
   const handleSearchChange = (event) => {
     const value = event.target.value;
