@@ -8,16 +8,28 @@ import moment from "moment";
 import PopUp from "../../fragments/PopUp";
 import "../../../general.css";
 import Main from "../Main";
-
+import { useLocation } from "react-router-dom";
 
 const Admin = () => {
   const [tasksAlert, setTasksAlert] = useState([]);
-  const nav = [
-    { link: "/admin", label: "פרויקטים" },
-    { link: "/quality", label: "בקרת איכות" },
-    { link: "/employees", label: "עובדים" },
-  ];
-  // const components = [ModalProjectAdd, ProjectTable];
+  const location = useLocation();
+  const userRole = location.state?.userRole || "";
+
+  let nav = [];
+
+  // Set navigation links based on the user's role
+  if (userRole === "מנהל פרויקט") {
+    nav = [
+      { link: "/admin", label: "פרויקטים" },
+      { link: "/quality", label: "בקרת איכות" },
+      { link: "/employees", label: "עובדים" },
+    ];
+  } else {
+    nav = [
+      { link: "/admin", label: "פרויקטים" },
+      { link: "/quality", label: "בקרת איכות" },
+    ];
+  }
 
   const fetchData = async () => {
     try {
@@ -57,11 +69,15 @@ const Admin = () => {
         {combinedMessage && <PopUp myMessage={combinedMessage} />}
         <section className="section_main">
           <div className="mainSection">
-            <MyModal content="הוספת פרויקט חדש" btnStyle="primary">
-              <FormProjectAdd />
-            </MyModal>
-            <ProjectTable />
+            {/* Check if the userRole is "admin" to show the add project modal */}
+            {userRole === "מנהל פרויקט" && (
+              <MyModal content="הוספת פרויקט חדש" btnStyle="primary">
+                <FormProjectAdd />
+              </MyModal>
+            )}
+            <ProjectTable userRole={userRole} />
 
+            {/* You can uncomment the following code if you have an array of components */}
             {/* {components.map((Component, index) => (
               <div style={{ padding: "20px" }}>
                 <Component key={index} />
@@ -71,9 +87,7 @@ const Admin = () => {
         </section>
       </Main>
 
-      <Footer className="footer">
-        ©2023 Created by Nastya
-      </Footer>
+      <Footer className="footer">©2023 Created by Nastya</Footer>
     </div>
   );
 };

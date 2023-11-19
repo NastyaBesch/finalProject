@@ -1,0 +1,12 @@
+/* Login.css */
+.loginForm {
+  max-width: 600px;
+  margin: 0 auto; /* Center the form horizontally */
+  margin-top: 300px;
+  padding-top: 6rem; 
+  padding-left: 6rem;
+  background-color: rgb(243, 239, 239);
+  border-style: double;
+  border-color: rgb(118, 118, 118);
+  border-radius: 8px;  
+}
